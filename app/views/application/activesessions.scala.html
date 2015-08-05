@@ -1,4 +1,4 @@
-@(message:String,user:model.User, chirpMap:HashMap[String, model.Message])
+@(message:String,user:model.User)
 
 <!DOCTYPE html>
 <html>
@@ -114,22 +114,33 @@
         <!--^^^^^ LEFT PANEL - - same for every page ^^^^^^^-->
         <!--vvvvv RIGHT CONTENT PANEL - - differs per page vvvvv-->
         <div class="col-md-8">
-            <!--IF USER IS LOGGED IN AND THE HASHMAP IS NOT EMPTY, PRINTS EACH USER EMAIL AND MESSAGE IN A SEPARATE PANEL-->
+            <!--IF USER IS LOGGED IN, PRESENTS EACH SESSION AND A LOGOUT BUTTON FOR EACH-->
             @if(user!=null){
-                @if(chirpMap!=null){
-                    @for((chirpId,chirp) <- chirpMap) {
-                        <div class="panel panel-primary">
-                            <div class="panel heading"><a href="user?email=@chirp.getUser().getEmail">@chirp.getUser().getEmail</a></div>
-                            <div class="panel body">
-                                @chirp.getMessage
-                            </div>
-                        </div>
-                    }
+            <div class="panel panel-primary">
+                <div class="panel heading"><p class="bg-primary">Active Sessions </p></div>
+                <div class="panel body">
+                    <table>
+                        <thead>
+                        <tr><th>Session Id</th><th>IP Address</th><th>Login Time</th></tr>
+                        </thead>
+                        @for((sessionId,session) <- user.getMap()) {
+                        <tr>
+                            <form action="logout" method="post">
+                                <td>@sessionId</td>
+                                <td>@session.getIpAddress</td>
+                                <td>@session.getSince</td>
+                                <input type="hidden" value="@sessionId" name="sessionId">
+                                <input type="hidden" value="@user" name="user">
+                                <td><button type="submit" >Logout</button></td>
+                            </form>
+                        </tr>
+                        }
+                    </table>
+                </div>
                 }
-            }
+            </div>
         </div>
         <!--^^^^^ RIGHT PANEL - - differs per page ^^^^^^^-->
     </div>
-</div>
 </body>
 </html>

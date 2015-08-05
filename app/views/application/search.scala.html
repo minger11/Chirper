@@ -116,16 +116,16 @@
         <div class="col-md-8">
             <!--IF USER IS LOGGED IN AND THE HASHMAP IS NOT EMPTY, PRINTS EACH USER EMAIL AND MESSAGE IN A SEPARATE PANEL-->
             @if(user!=null){
-                @if(chirpMap!=null){
-                    @for((chirpId,chirp) <- chirpMap) {
-                        <div class="panel panel-primary">
-                            <div class="panel heading"><a href="user?email=@chirp.getUser().getEmail">@chirp.getUser().getEmail</a></div>
-                            <div class="panel body">
-                                @chirp.getMessage
-                            </div>
-                        </div>
-                    }
-                }
+            @if(chirpMap!=null){
+            @for((chirpId,chirp) <- chirpMap) {
+            <div class="panel panel-primary">
+                <div class="panel heading"><a href="user?email=@chirp.getUser().getEmail">@chirp.getUser().getEmail</a></div>
+                <div class="panel body">
+                    @chirp.getMessage
+                </div>
+            </div>
+            }
+            }
             }
         </div>
         <!--^^^^^ RIGHT PANEL - - differs per page ^^^^^^^-->

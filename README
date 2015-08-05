@@ -1,0 +1,6 @@
+
+Turing port 50468
+
+Please be aware that POST /api/postmessage only works for a user that is logged in. Not sure how you plan on doing this but i was using the chrome postman rest extension, this way you can login to the application on a chrome tab then open a separate tab, open postman and post messages in text format to api/postmessage.
+
+I have no other comments at this stage. I have managed to get everything working as stated in the assignment 1 objectives.
