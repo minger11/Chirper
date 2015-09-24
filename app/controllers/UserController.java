@@ -32,8 +32,8 @@ public class UserController extends Controller {
     //returns the session id of the present session and creates one if none exists
     public static String getSessionId(){
         String id = session(sessionVar);
-        if(id == null) {
-            id = java.util.UUID.randomUUID().toString();
+        if(!instance.isValidId(id)) {
+            id = instance.allocateId();
             session(sessionVar, id);
         }
         return id;
@@ -62,10 +62,9 @@ public class UserController extends Controller {
         }
         if(email.equals(email2)) {
             if (BCrypter.checkpassword(request().body().asFormUrlEncoded().getOrDefault("password2", new String[0])[0], hash)) {
-                User person = new User(email, "", hash);
+                User person = new User(instance.allocateId(), email, hash);
                 UserController.instance.registerUser(person);
-                //User newguy = UserController.instance.getUser(id);
-                return ok(views.html.application.login.render("Account successfully created! Please login", getExistingUser()));
+                return ok(views.html.application.login.render("Account successfully created! Please login.", getExistingUser()));
             } else {
                 return ok(views.html.application.register.render("Passwords didn't match. Please try again", getExistingUser()));
             }
@@ -82,6 +81,10 @@ public class UserController extends Controller {
     public static Result doLogin(){
         String email = request().body().asFormUrlEncoded().getOrDefault("email", new String[0])[0];
         String password = request().body().asFormUrlEncoded().getOrDefault("password", new String[0])[0];
+
+        User u = instance.getUser(email, password);
+
+        //check if logged in as someone else
         if(UserController.instance.userExists(email)) {
             if (getExistingUser() != null) {
                 if (getExistingUser().getEmail().equals(email)) {
@@ -90,9 +93,12 @@ public class UserController extends Controller {
                     getExistingUser().removeUserSession(getSessionId());
                 }
             }
-            if (BCrypter.checkpassword(password, UserController.instance.getUser(email).getHash())) {
-                Session currentSession = new Session(request().remoteAddress());
-                UserController.instance.getUser(email).newUserSession(getSessionId(), currentSession);
+
+            //check password and login
+            if (BCrypter.checkpassword(password, u.getHash())) {
+                Session currentSession = new Session(getSessionId(), request().remoteAddress(), System.currentTimeMillis());
+                u.newUserSession(getSessionId(), currentSession);
+                instance.update(u);
                 return index();
             } else {
                 return ok(views.html.application.login.render("Incorrect password, please try again", getExistingUser()));
@@ -113,7 +119,12 @@ public class UserController extends Controller {
 
     //removes the user from the current session and returns the user to the default index
     public static Result doLogOut(){
-        UserController.instance.getUserFromSession(getSessionId()).removeUserSession(getSessionId());
+        //get user of current session
+        User u = UserController.instance.getUserFromSession(getSessionId());
+        //remove session from user
+        u.removeUserSession(getSessionId());
+        //update the database
+        instance.update(u);
         return index();
     }
 
@@ -127,8 +138,14 @@ public class UserController extends Controller {
     //if valid, returns user to active sessions with a success message
     //if current session isnt valid, returns user to index
     public static Result remoteLogout(){
+        //Define remote session selected by user
         String sessionId = request().body().asFormUrlEncoded().getOrDefault("sessionId", new String[0])[0];
-        UserController.instance.getUserFromSession(getSessionId()).removeUserSession(sessionId);
+        //get user of current session
+        User u = UserController.instance.getUserFromSession(getSessionId());
+        //remove session from user
+        u.removeUserSession(sessionId);
+        //update the database
+        instance.update(u);
         if(getExistingUser()!=null){
             return ok(views.html.application.activesessions.render(("logged out of session "+sessionId),getExistingUser()));
         } else {
@@ -143,7 +160,7 @@ public class UserController extends Controller {
     public static Result doPost() {
         String text = request().body().asFormUrlEncoded().getOrDefault("message", new String[0])[0];
         if(text!="") {
-            Message message = new Message(getExistingUser(), text);
+            Message message = new Message(instance.allocateId(), getExistingUser().getId(), text);
             UserController.store.storeMessage(message);
             return ok(views.html.application.index.render("Message posted!",getExistingUser(), UserController.store.getMessageStore()));
         } else {
@@ -155,7 +172,7 @@ public class UserController extends Controller {
     //fetches the user and passes it to the user page
     public static Result user(String email){
         User user = UserController.instance.getUser(email);
-        return ok(views.html.application.index.render(null, user, UserController.store.getUserMessages(user)));
+        return ok(views.html.application.index.render(null, getExistingUser(), UserController.store.getUserMessages(user)));
     }
 
     //searches for the parameter string and returns a hashmap of all messages containing the string to the search page
@@ -202,7 +219,7 @@ public class UserController extends Controller {
         String text = body.asText();
         if(getExistingUser()!=null) {
             if (text != "") {
-                Message message = new Message(getExistingUser(), text);
+                Message message = new Message(instance.allocateId(), getExistingUser().getId(), text);
                 UserController.store.storeMessage(message);
                 return ok("Message posted!");
             } else {

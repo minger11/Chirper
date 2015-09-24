@@ -9,21 +9,25 @@ public class Session {
         String ipAddress;
         long since;
 
-        //creates a new session given an ip address
-        //creates a random session id and stores the time and ip address
-        public Session(String ipAddress){
-        this.id = java.util.UUID.randomUUID().toString();
-        this.since = System.currentTimeMillis();
-        this.ipAddress = ipAddress;
+        //overload for now
+        public Session(String id, String ipAddress, long since) {
+                this.id = id;
+                this.ipAddress = ipAddress;
+                this.since = since;
+        }
+
+        public String getId() {
+                return id;
         }
 
         //returns the ip address
         public String getIpAddress() {
-        return this.ipAddress;
+        return ipAddress;
         }
 
         //returns the time session started in millis
         public long getSince() {
-        return this.since;
+        return since;
         }
 }
+

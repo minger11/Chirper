@@ -119,7 +119,8 @@
             @if(chirpMap!=null){
             @for((chirpId,chirp) <- chirpMap) {
             <div class="panel panel-primary">
-                <div class="panel heading"><a href="user?email=@chirp.getUser().getEmail">@chirp.getUser().getEmail</a></div>
+                <div class="panel heading">User @chirp.getUserId</div>
+                    <!--<a href="user?email=chirp.getUser().getEmail">chirp.getUser().getEmail</a></div>-->
                 <div class="panel body">
                     @chirp.getMessage
                 </div>

@@ -9,7 +9,7 @@ import java.util.regex.*;
 //the message class
 public class Message {
     String message;
-    User user;
+    String userId;
     long time;
     String id;
     List <String> tags;
@@ -18,11 +18,11 @@ public class Message {
     //takes in a user and a string
     //sets the time and an id
     //creates an arraylist of the tags which are found through a regex
-    public Message(User user, String message){
+    public Message(String id, String userId, String message){
         this.time = System.currentTimeMillis();
         this.message = message;
-        this.user = user;
-        this.id = Long.toString(System.currentTimeMillis());
+        this.userId = userId;
+        this.id = id;
         this.tags = new ArrayList<String>();
         Pattern pattern = Pattern.compile("#(\\w+)");
         Matcher matcher = pattern.matcher(message);
@@ -34,8 +34,8 @@ public class Message {
     //returns the arraylist of tags
     public List<String> getTags() { return this.tags; }
 
-    //returns the user
-    public User getUser() { return this.user; }
+    //returns the userId
+    public String getUserId() { return this.userId; }
 
     //returns the time
     public long getTime() {
