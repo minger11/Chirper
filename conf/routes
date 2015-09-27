@@ -16,7 +16,14 @@ GET     /user                       controllers.UserController.user(email)
 GET     /search                     controllers.UserController.search(search)
 GET     /api/users/:user            controllers.UserController.userMessages(user: String)
 GET     /api/tags/:tag              controllers.UserController.taggedMessages(tag: String)
-POST    /api/postmessage            controllers.UserController.postMessage()
+POST    /api/postmessage            controllers.UserController.postAMessage()
+GET     /spa                        controllers.UserController.spa()
+
+GET     /message                    controllers.UserController.getMessage(n: String)
+POST    /message                    controllers.UserController.postMessage()
+OPTIONS /message                    controllers.UserController.optionsMessage()
+
+GET     /websocket                  controllers.UserController.socket(topic:String)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)

@@ -8,5 +8,9 @@ lazy val root = (project in file(".")).enablePlugins(PlayJava)
 
 libraryDependencies ++= Seq(
   "org.mindrot" % "jbcrypt" % "0.3m",
-  "org.mongodb" % "mongodb-driver" % "3.0.2"
+  "org.mongodb" % "mongodb-driver" % "3.0.2",
+  "org.json"%"org.json"%"chargebee-1.0"
 )
+
+//compile to javascript
+pipelineStages := Seq(rjs)

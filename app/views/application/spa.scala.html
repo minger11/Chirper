@@ -1,0 +1,42 @@
+@(user:model.User)
+
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <!-- Personalized css -->
+    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/main.css")">
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+
+    <!-- JQuery script -->
+    <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
+    <script src="https://fb.me/react-0.13.3.js"></script>
+
+    <script src="@routes.Assets.versioned("javascripts/xhr.js")" defer ></script>
+    <script src="@routes.Assets.versioned("javascripts/message.js")" defer ></script>
+
+
+
+    <meta charset="UTF-8">
+    <title>Chirper</title>
+</head>
+<body>
+    @if(user!=null){
+    <input type="hidden" id="loggedIn" value="yes" />
+    <input type="hidden" id="userEmail" value="@user.getEmail()" />
+    } else {
+    <input type="hidden" id="loggedIn" value="no" />
+    <input type="hidden" id="userEmail" value=null />
+    }
+    <div id="renderMessages"></div>
+
+</body>
+</html>

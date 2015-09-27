@@ -13,7 +13,12 @@ import play.libs.Json;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.JsonNode.*;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import play.mvc.WebSocket;
 
+import model.Message;
+import model.GibberishHub;
+import play.mvc.WebSocket;
 
 /**
  * Created by mingerso on 31/07/15.
@@ -50,6 +55,79 @@ public class UserController extends Controller {
             return ok(views.html.application.index.render(null,getExistingUser(), UserController.store.getMessageStore()));
     }
 
+    //sends the existing user and their messages to index page
+    public static Result spa() {
+        return ok(views.html.application.spa.render(getExistingUser()));
+    }
+
+    public static Result getMessage(String n) {
+        response().setHeader("Access-Control-Allow-Origin", "*");
+        return ok(UserController.store.searchStore(n));
+    }
+
+    public static ObjectNode toJson(Message m) {
+        ObjectNode n = Json.newObject();
+        n.put("message", m.getMessage());
+        n.put("user", m.getUserId());
+        n.put("age", m.getTime());
+        return n;
+    }
+
+    /**
+     * Cross-origin POST requests with JSON content require an OPTIONS request first. The response must contain the
+     * CORS header.
+     */
+    public static Result optionsMessage() {
+        response().setHeader("Access-Control-Allow-Origin", "*");
+        response().setHeader("Access-Control-Allow-Credentials", "true");
+        response().setHeader("Access-Control-Allow-Headers", "content-type");
+        return ok("");
+    }
+
+    public static Result postMessage() {
+
+        //extract the posted message
+        JsonNode json = request().body().asJson();
+
+        if(json == null) {
+            return ok("Expecting Json data");
+        } else {
+
+            //get current time
+            long time = System.currentTimeMillis();
+
+            //create a new message using the text, current user and current time
+            Message message = new Message(instance.allocateId(), getExistingUser().getId(), json.findPath("message").textValue(), time);
+
+            //store message in database
+            UserController.store.storeMessage(message);
+
+            //alert hub that a new message has been created
+            GibberishHub.getInstance().send(message);
+
+            //allow post to be made
+            response().setHeader("Access-Control-Allow-Origin", "*");
+            return ok("");
+        }
+    }
+
+    /**
+     * Our WebSockets endpoint. We'll assume we're sending String messages for now
+     */
+    public static WebSocket<String> socket(String topic) {
+
+        /*
+         Play framework provides an Actor for client automatically. That's the <code>out</code> argument below.
+
+         We need to tell Play what kind of actor we want on the server side. We do that with a "Props" object, because
+         Play will ask Akka to create the actor for us.
+
+         We want a GibberishWebSocketActor, and we want to pass the client actor and the topic as constructor arguments.
+         GibberishWebSocketActor.props(topic, out) will produce a Props object saying that.
+         */
+        return WebSocket.<String>withActor((out) -> GibberishWebSocketActor.props(topic, out));
+    }
+
     //checks the two emails and passwords against each other
     //returns to page if no match or if email exists in database
     //if successful, sends user to index with success message
@@ -64,7 +142,7 @@ public class UserController extends Controller {
             if (BCrypter.checkpassword(request().body().asFormUrlEncoded().getOrDefault("password2", new String[0])[0], hash)) {
                 User person = new User(instance.allocateId(), email, hash);
                 UserController.instance.registerUser(person);
-                return ok(views.html.application.login.render("Account successfully created! Please login.", getExistingUser()));
+                return redirect("/spa");
             } else {
                 return ok(views.html.application.register.render("Passwords didn't match. Please try again", getExistingUser()));
             }
@@ -99,7 +177,7 @@ public class UserController extends Controller {
                 Session currentSession = new Session(getSessionId(), request().remoteAddress(), System.currentTimeMillis());
                 u.newUserSession(getSessionId(), currentSession);
                 instance.update(u);
-                return index();
+                return redirect("/spa");
             } else {
                 return ok(views.html.application.login.render("Incorrect password, please try again", getExistingUser()));
             }
@@ -125,7 +203,7 @@ public class UserController extends Controller {
         u.removeUserSession(getSessionId());
         //update the database
         instance.update(u);
-        return index();
+        return redirect("/spa");
     }
 
     //sends user to the viewsessions page with a hashmap of the users activesessions
@@ -160,7 +238,8 @@ public class UserController extends Controller {
     public static Result doPost() {
         String text = request().body().asFormUrlEncoded().getOrDefault("message", new String[0])[0];
         if(text!="") {
-            Message message = new Message(instance.allocateId(), getExistingUser().getId(), text);
+            long time = System.currentTimeMillis();
+            Message message = new Message(instance.allocateId(), getExistingUser().getId(),text, time);
             UserController.store.storeMessage(message);
             return ok(views.html.application.index.render("Message posted!",getExistingUser(), UserController.store.getMessageStore()));
         } else {
@@ -177,7 +256,7 @@ public class UserController extends Controller {
 
     //searches for the parameter string and returns a hashmap of all messages containing the string to the search page
     public static Result search(String search){
-        return ok(views.html.application.search.render(null,getExistingUser(),UserController.store.getTaggedMessages(search)));
+        return ok(views.html.application.index.render(null,getExistingUser(),UserController.store.getTaggedMessages(search)));
     }
 
     //returns a json object of all messages for the user who has the email given as a parameter
@@ -214,12 +293,13 @@ public class UserController extends Controller {
     }
 
     //accepts plain text input and posts the text as a message to the current users message hashmap
-    public static Result postMessage() {
+    public static Result postAMessage() {
         RequestBody body = request().body();
         String text = body.asText();
         if(getExistingUser()!=null) {
             if (text != "") {
-                Message message = new Message(instance.allocateId(), getExistingUser().getId(), text);
+                long time = System.currentTimeMillis();
+                Message message = new Message(instance.allocateId(), getExistingUser().getId(), text, time);
                 UserController.store.storeMessage(message);
                 return ok("Message posted!");
             } else {
