@@ -3,8 +3,8 @@ package model;
 /**
  * A Single Abstract Method (SAM) interface for things that want to hear about messages
  */
-public interface GibberishListener {
+public interface MessageListener {
 
-    public void receiveGibberish(Message g);
+    public void receiveMessage(Message g);
 
 }

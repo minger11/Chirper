@@ -1,7 +1,6 @@
 package model;
 
 import java.util.*;
-
 import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 /**
@@ -62,6 +61,7 @@ public class User{
         return activeSessions.containsKey(sessionId);
     }
 
+    //returns an array of current sessions
     public Session[] getSessions() {
         Collection<Session> values = activeSessions.values();
         return values.toArray(new Session[values.size()]);

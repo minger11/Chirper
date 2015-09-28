@@ -9,13 +9,14 @@ public class Session {
         String ipAddress;
         long since;
 
-        //overload for now
+        //session constructor takes an id string and ip address and a long for the time in millis
         public Session(String id, String ipAddress, long since) {
                 this.id = id;
                 this.ipAddress = ipAddress;
                 this.since = since;
         }
 
+        //return the sessionId
         public String getId() {
                 return id;
         }

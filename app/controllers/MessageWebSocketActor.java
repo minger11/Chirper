@@ -1,10 +1,10 @@
 package controllers;
 
 import akka.actor.*;
-import model.GibberishHub;
-import model.GibberishListener;
+import model.MessageHub;
+import model.MessageListener;
 
-public class GibberishWebSocketActor extends UntypedActor {
+public class MessageWebSocketActor extends UntypedActor {
 
     /**
      * We don't create the actor ourselves. Instead, Play will ask Akka to make it for us. We have to give Akka a
@@ -13,9 +13,9 @@ public class GibberishWebSocketActor extends UntypedActor {
      */
     public static Props props(String topic, ActorRef out) {
         // Create a Props object that says:
-        // - I want a GibberishWebSocketActor,
+        // - I want a MessageWebSocketActor,
         // - and pass (topic, out) as the arguments to its constructor
-        return Props.create(GibberishWebSocketActor.class, topic, out);
+        return Props.create(MessageWebSocketActor.class, topic, out);
     }
 
     /** The Actor for the client (browser) */
@@ -24,43 +24,32 @@ public class GibberishWebSocketActor extends UntypedActor {
     /** The topic string we have subscribed to */
     private final String topic;
 
-    /** A listener that we will register with our GibberishHub */
-    private final GibberishListener listener;
+    /** A listener that we will register with our MessageHub */
+    private final MessageListener listener;
 
     /**
      * This constructor is called by Akka to create our actor (we don't call it ourselves).
      */
-    public GibberishWebSocketActor(String topic, ActorRef out) {
+    public MessageWebSocketActor(String topic, ActorRef out) {
         this.topic = topic;
         this.out = out;
 
         /*
-          Our GibberishListener, written as a Java 8 Lambda.
+          Our MessageListener, written as a Java 8 Lambda.
           Whenever we receive a gibberish, convert it to a JSON string, and send it to the client.
          */
         this.listener = (g) -> {
-           // String message = UserController.toJson(g).toString();
-            String message = UserController.store.getStoreJson(this.topic).toString();
+           // String message = Application.toJson(g).toString();
+            String message = Application.database.searchMessages(this.topic).toString();
                 /*
                  This asynchronously sends the message to the WebSocket client.
                  Self is a reference to this actor (the sender)
                  */
             out.tell(message, self());
-            /**
-            if (g.getMessage().equals(this.topic)) {
-                // Convert the ibberish to a JSON string
-                //String message = UserController.toJson(g).toString();
-                String message = "hi there";
-
-                 //This asynchronously sends the message to the WebSocket client.
-                 //Self is a reference to this actor (the sender)
-
-                out.tell(message, self());
-            }*/
         };
 
         // Register this actor to hear gibberish
-        GibberishHub.getInstance().addListener(listener);
+        MessageHub.getInstance().addListener(listener);
     }
 
     /**
@@ -79,6 +68,6 @@ public class GibberishWebSocketActor extends UntypedActor {
      */
     public void postStop() throws Exception {
         // De-register our listener
-        GibberishHub.getInstance().removeListener(this.listener);
+        MessageHub.getInstance().removeListener(this.listener);
     }
 }

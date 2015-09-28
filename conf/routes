@@ -2,28 +2,30 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-# Home page
-GET     /                           controllers.UserController.index()
-GET     /register                   controllers.UserController.registerForm()
-POST    /register                   controllers.UserController.doRegister()
-POST    /login                      controllers.UserController.doLogin()
-GET     /login                      controllers.UserController.loginForm()
-GET     /logout                     controllers.UserController.doLogOut()
-GET     /viewactivesessions         controllers.UserController.viewSessionsForm()
-POST    /logout                     controllers.UserController.remoteLogout()
-POST    /post                       controllers.UserController.doPost()
-GET     /user                       controllers.UserController.user(email)
-GET     /search                     controllers.UserController.search(search)
-GET     /api/users/:user            controllers.UserController.userMessages(user: String)
-GET     /api/tags/:tag              controllers.UserController.taggedMessages(tag: String)
-POST    /api/postmessage            controllers.UserController.postAMessage()
-GET     /spa                        controllers.UserController.spa()
+#Home, registration and logout pages
+GET     /                           controllers.Application.index()
+GET     /register                   controllers.Application.register()
+POST    /register                   controllers.Application.doRegister()
+POST    /login                      controllers.Application.doLogin()
+GET     /logout                     controllers.Application.doLogOut()
+GET     /sessions                   controllers.Application.sessions()
+POST    /logout                     controllers.Application.remoteLogout()
 
-GET     /message                    controllers.UserController.getMessage(n: String)
-POST    /message                    controllers.UserController.postMessage()
-OPTIONS /message                    controllers.UserController.optionsMessage()
+#APIs
+GET     /api/users/:user            controllers.Application.userMessages(user: String)
+GET     /api/tags/:tag              controllers.Application.messagesFromStore(tag: String)
+POST    /api/postmessage            controllers.Application.postAPIMessage()
 
-GET     /websocket                  controllers.UserController.socket(topic:String)
+#Single Page Application
+GET     /spa                        controllers.Application.spa()
+
+#XMLHttp requests
+GET     /message                    controllers.Application.getMessage(n: String)
+POST    /message                    controllers.Application.postMessage()
+OPTIONS /message                    controllers.Application.optionsMessage()
+
+#Websocket
+GET     /ws                         controllers.Application.socket(topic:String)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)

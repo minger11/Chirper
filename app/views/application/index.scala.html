@@ -1,4 +1,4 @@
-@(message:String,user:model.User, chirpMap:HashMap[String, model.Message])
+@(message:String,user:model.User)
 
 <!DOCTYPE html>
 <html>
@@ -35,21 +35,12 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="/">Chirper</a>
+            <a class="navbar-brand" href="/spa">Chirper</a>
             <p class="navbar-text">Tell everyone everything!</p>
         </div>
         <!--PRESENTS SEARCH BAR IF USER LOGGED IN, PRESENTS LOGIN PANEL IF USER NOT LOGGED IN-->
         <ul class="nav navbar-nav navbar-right">
-            @if(user!=null){
-            <li>
-                <form class="navbar-form navbar-left" role="search" action="search">
-                    <div class="form-group">
-                        <input type="text" name="search" class="form-control" placeholder="Search Chirper">
-                    </div>
-                    <button type="submit" class="btn btn-default">Search</button>
-                </form>
-            </li>
-            } else {
+            @if(user==null){
             <li>
                 <form class="navbar-form navbar-left" method="post" action="login">
                     <div class="form-group">
@@ -67,15 +58,14 @@
                     @user.getEmail()
                     <span class="caret"></span></a>
                 <ul class="dropdown-menu">
-                    <li><a href="user?email=@user.getEmail">My Chirps</a> </li>
-                    <li><a href="viewactivesessions">Active Sessions</a></li>
+                    <li><a href="spa">Home</a> </li>
+                    <li><a href="sessions">Active Sessions</a></li>
                     <li><a href="logout">Logout</a></li>
                     } else {
                     Not logged in
                     <span class="caret"></span></a>
                     <ul class="dropdown-menu">
                         <li><a href="register">Register</a></li>
-                        <li><a href="login">Login</a></li>
                         }
                     </ul>
             </li>
@@ -90,12 +80,7 @@
     <div class="row">
         <div class="col-md-4">
             <!--IF LOGGED IN PRESENTS POST PANEL, OTHERWISE PRESENTS LOGIN MESSAGE-->
-            @if(user!=null){
-            <form action="post" method="post">
-                <textarea class="form-control" rows="col-md-4" name="message" maxlength="140" placeholder="Post to Chirper!"></textarea>
-                <button type="submit">Post</button>
-            </form>
-            } else {
+            @if(user==null){
             <div class="panel panel-warning">
                 <div class="panel body">
                     <p class="bg-warning">Login or Register to access Chirper!</p>
@@ -113,22 +98,7 @@
         </div>
         <!--^^^^^ LEFT PANEL - - same for every page ^^^^^^^-->
         <!--vvvvv RIGHT CONTENT PANEL - - differs per page vvvvv-->
-        <div class="col-md-8">
-            <!--IF USER IS LOGGED IN AND THE HASHMAP IS NOT EMPTY, PRINTS EACH USER EMAIL AND MESSAGE IN A SEPARATE PANEL-->
-            @if(user!=null){
-                @if(chirpMap!=null){
-                    @for((chirpId,chirp) <- chirpMap) {
-                        <div class="panel panel-primary">
-                            <div class="panel heading">User @chirp.getUserId</div>
-                                <!--<a href=<"user?email=chirp.getUser().getEmail">chirp.getUser().getEmail</a></div>-->
-                            <div class="panel body">
-                                @chirp.getMessage
-                            </div>
-                        </div>
-                    }
-                }
-            }
-        </div>
+
         <!--^^^^^ RIGHT PANEL - - differs per page ^^^^^^^-->
     </div>
 </div>

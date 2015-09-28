@@ -6,15 +6,6 @@ import java.util.regex.*;
  * Created by mingerso on 4/08/15.
  */
 
-/**
- * public Gibberish() {
- this.subject = allocate(SUBJECTS);
- this.adverb = allocate(ADVERBS);
- this.verb = allocate(VERBS);
- this.adjective = allocate(ADJECTIVES);
- this.obj = allocate(OBJS);
- }
- */
 //the message class
 public class Message {
     String message;
@@ -23,7 +14,7 @@ public class Message {
     String id;
     List <String> tags;
 
-    //constructor for a new mesage
+    //constructor for a new message
     //takes in a user and a string
     //sets the time and an id
     //creates an arraylist of the tags which are found through a regex

@@ -25,6 +25,8 @@
 </head>
 <body>
 <!--vvvvv TOP MENU NAVIGATION BAR - - same for every page vvvvvv-->
+<!--vvvvv TOP MENU NAVIGATION BAR - - same for every page vvvvvv-->
+<!--vvvvv TOP MENU NAVIGATION BAR - - same for every page vvvvvv-->
 <nav class="navbar navbar-default navbar-fixed-top">
     <div class="container-fluid">
         <!--CHIRPER LOGO/HOME BUTTON AND CATCHPHRASE-->
@@ -35,21 +37,12 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="/">Chirper</a>
+            <a class="navbar-brand" href="/spa">Chirper</a>
             <p class="navbar-text">Tell everyone everything!</p>
         </div>
         <!--PRESENTS SEARCH BAR IF USER LOGGED IN, PRESENTS LOGIN PANEL IF USER NOT LOGGED IN-->
         <ul class="nav navbar-nav navbar-right">
-            @if(user!=null){
-            <li>
-                <form class="navbar-form navbar-left" role="search" action="search">
-                    <div class="form-group">
-                        <input type="text" name="search" class="form-control" placeholder="Search Chirper">
-                    </div>
-                    <button type="submit" class="btn btn-default">Search</button>
-                </form>
-            </li>
-            } else {
+            @if(user==null){
             <li>
                 <form class="navbar-form navbar-left" method="post" action="login">
                     <div class="form-group">
@@ -67,15 +60,14 @@
                     @user.getEmail()
                     <span class="caret"></span></a>
                 <ul class="dropdown-menu">
-                    <li><a href="user?email=@user.getEmail">My Chirps</a> </li>
-                    <li><a href="viewactivesessions">Active Sessions</a></li>
+                    <li><a href="spa">Home</a> </li>
+                    <li><a href="sessions">Active Sessions</a></li>
                     <li><a href="logout">Logout</a></li>
                     } else {
                     Not logged in
                     <span class="caret"></span></a>
                     <ul class="dropdown-menu">
                         <li><a href="register">Register</a></li>
-                        <li><a href="login">Login</a></li>
                         }
                     </ul>
             </li>
@@ -84,18 +76,14 @@
     </div><!-- /.container-fluid -->
 </nav>
 <!--^^^^^ TOP MENU NAVIGATION BAR - - same for every page ^^^^^^^-->
+<!--^^^^^ TOP MENU NAVIGATION BAR - - same for every page ^^^^^^^-->
 
 <!--vvvvv LEFT PANEL - - same for every page vvvvvv-->
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-4">
             <!--IF LOGGED IN PRESENTS POST PANEL, OTHERWISE PRESENTS LOGIN MESSAGE-->
-            @if(user!=null){
-            <form action="post" method="post">
-                <textarea class="form-control" rows="col-md-4" name="message" maxlength="140" placeholder="Post to Chirper!"></textarea>
-                <button type="submit">Post</button>
-            </form>
-            } else {
+            @if(user==null){
             <div class="panel panel-warning">
                 <div class="panel body">
                     <p class="bg-warning">Login or Register to access Chirper!</p>
@@ -113,23 +101,34 @@
         </div>
         <!--^^^^^ LEFT PANEL - - same for every page ^^^^^^^-->
         <!--vvvvv RIGHT CONTENT PANEL - - differs per page vvvvv-->
-        <div class="col-md-8">
-            <!--PRESENTS A LOGIN FORM TO THE USER-->
-            <div class="panel panel-primary">
-                <div class="panel heading"><p class="bg-primary">Login</p></div>
-                <div class="panel body">
-                    <form action="login" method="post">
-                        <h3>Enter your email:</h3>
-                        <input type="text" name="email">
-                        <h3>Enter your password:</h3>
-                        <input type="password" name="password" />
-                        <button type="submit">Submit</button>
-                    </form>
+        <div class="col-md-4">
+            <!--IF USER IS LOGGED IN, PRESENTS EACH SESSION AND A LOGOUT BUTTON FOR EACH-->
+            @if(user!=null){
+            <div class="panel panel-default">
+                <div class="panel-heading"><h4>Active Sessions</h4></div>
+                <div class="panel-body">
+                    <table>
+                        <thead>
+                        <tr><th>Session Id</th><th>IP Address</th><th>Login Time</th></tr>
+                        </thead>
+                        @for((sessionId,session) <- user.getActiveSessions()) {
+                        <tr>
+                            <form action="logout" method="post">
+                                <td>@sessionId</td>
+                                <td>@session.getIpAddress</td>
+                                <input type="hidden" value="@sessionId" name="sessionId">
+                                <input type="hidden" value="@user" name="user">
+                                <td><button type="submit" >Logout</button></td>
+                            </form>
+                        </tr>
+                        }
+                    </table>
                 </div>
+                <div class="panel-footer"></div>
+                }
             </div>
         </div>
         <!--^^^^^ RIGHT PANEL - - differs per page ^^^^^^^-->
     </div>
-</div>
 </body>
 </html>
