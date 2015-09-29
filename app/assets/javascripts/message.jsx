@@ -68,7 +68,7 @@ var Message = React.createClass({
                       <div className="message">{obj.message}</div>
                </div>
                <div className="panel-footer">
-                                     <TagList tags={obj.tags}/>
+                                     <TagList tags={obj.tags} />
                               </div>
     </div>
   }
@@ -79,7 +79,7 @@ var Message = React.createClass({
 var MessageList = React.createClass({
   render: function() {
     return <ul>{this.props.messageList.map(function(item) {
-      return <Message message={item} />
+      return <Message message={item} key={item.messageId} />
     })}</ul>;
   }
 });
@@ -89,7 +89,7 @@ var MessageList = React.createClass({
 var TagList = React.createClass({
   render: function() {
     return <div>{this.props.tags.map(function(item) {
-        return <Tag tag={item}/>
+        return <Tag tag={item} key={item.tag} />
     })}</div>;
 }});
 

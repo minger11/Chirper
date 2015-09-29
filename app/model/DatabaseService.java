@@ -199,6 +199,7 @@ public class DatabaseService {
                 //Sends the document to messageFromBson, extracts the message and puts into object node
                 ObjectNode message = Json.newObject();
                 Message m = messageFromBson(cursor.next());
+                message.put("messageId", m.getId());
                 message.put("message", m.getMessage());
                 message.put("user", m.getUserId());
                 message.put("age", System.currentTimeMillis() - m.getTime());

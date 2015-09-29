@@ -1,6 +1,12 @@
 
-Turing port 50468
+Turing port 50486
 
-Please be aware that POST /api/postmessage only works for a user that is logged in. Not sure how you plan on doing this but i was using the chrome postman rest extension, this way you can login to the application on a chrome tab then open a separate tab, open postman and post messages in text format to api/postmessage.
+I have thoroughly enjoyed this project, thankyou.
 
-I have no other comments at this stage. I have managed to get everything working as stated in the assignment 1 objectives.
+I built it on Turing so you should have no problems running it. 
+
+I removed some of the old pages because their functionality were superseded by the SPA.
+
+I have put some data in the database for you to play with. The password for ALL accounts is: 1
+
+I have no other comments at this stage. I have managed to get everything working as stated in the assignment 2 objectives.
